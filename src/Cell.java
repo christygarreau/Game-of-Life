@@ -4,33 +4,70 @@ public class Cell {
     private int size;
     private CellState cellState;
     private int row;
-    private int column;
+    private int col;
 
-    Cell(int x, int y, int size, int row, int column, CellState cellState){
+    Cell(int x, int y, int size, int row, int col, CellState cellState){
         //initialize instance variables
         this.x = x;
         this.y = y;
         this.size = size;
         this.row = row;
-        this.column = column;
+        this.col = col;
         this.cellState = cellState;
 
     }
 
     public void evolve() {
-        //complete transition to alive or dead (if will revive then make it alive)
+        if(this.cellState == CellState.WILL_REVIVE){
+            this.cellState = CellState.ALIVE;
+        }
+
+        else if(this.cellState == CellState.WILL_DIE){
+            this.cellState = CellState.DEAD;
+        }
     }
 
     public void applyRules(Cell[][] cells){
-        //calculate live neighbors
-        int liveNeighbors = calculateLiveNeighbors(cells);
-        //determine the next state -- test 4 conditions on Wiki to determine state in next generation
+        int liveNeighbors =  calculateLiveNeighbors(cells);
+        if (this.cellState == cellState.ALIVE){
+            if(liveNeighbors > 3 || liveNeighbors < 2){
+                this.cellState = cellState.WILL_DIE;
+            }
+        }
+        else if (this.cellState == cellState.DEAD){
+            if(liveNeighbors == 3){
+                this.cellState = cellState.WILL_REVIVE;
+            }
+        }
     }
 
     private int calculateLiveNeighbors(Cell[][] cells){
-        //check each 8 neighboring cells and calculate how many are alive
-        //conditional statements
         int liveNeighbors = 0;
+        // look at state of eight surrounding cells
+        if (cells[row][col-1].cellState == CellState.ALIVE || cells[row][col-1].cellState == CellState.WILL_DIE){
+            liveNeighbors++;
+        }
+        if (cells[row][col+1].cellState == CellState.ALIVE || cells[row][col+1].cellState == CellState.WILL_DIE){
+            liveNeighbors++;
+        }
+        if (cells[row-1][col].cellState == CellState.ALIVE || cells[row-1][col].cellState == CellState.WILL_DIE){
+            liveNeighbors++;
+        }
+        if (cells[row+1][col].cellState == CellState.ALIVE || cells[row+1][col].cellState == CellState.WILL_DIE){
+            liveNeighbors++;
+        }
+        if (cells[row-1][col-1].cellState == CellState.ALIVE || cells[row-1][col-1].cellState == CellState.WILL_DIE){
+            liveNeighbors++;
+        }
+        if (cells[row+1][col-1].cellState == CellState.ALIVE || cells[row+1][col-1].cellState == CellState.WILL_DIE){
+            liveNeighbors++;
+        }
+        if (cells[row-1][col+1].cellState == CellState.ALIVE || cells[row-1][col+1].cellState == CellState.WILL_DIE){
+            liveNeighbors++;
+        }
+        if (cells[row+1][col+1].cellState == CellState.ALIVE || cells[row+1][col+1].cellState == CellState.WILL_DIE){
+            liveNeighbors++;
+        }
         return liveNeighbors;
     }
 
@@ -43,5 +80,15 @@ public class Cell {
             app.fill(84, 58, 89);
         }
         app.rect(x,y,size,size);
+    }
+
+    public void handleClick(int mouseX, int mouseY){
+        if(mouseX > x && mouseX < x+size && mouseY > y && mouseY < y+size){
+            if(cellState == CellState.ALIVE){
+                cellState = CellState.DEAD;
+            } else if (cellState == CellState.DEAD){
+                cellState = CellState.ALIVE;
+            }
+        }
     }
 }
