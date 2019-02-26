@@ -5,8 +5,9 @@ public class Cell {
     private CellState cellState;
     private int row;
     private int col;
+    private Rules rules;
 
-    Cell(int x, int y, int size, int row, int col, CellState cellState){
+    Cell(int x, int y, int size, int row, int col, CellState cellState, Rules rules){
         //initialize instance variables
         this.x = x;
         this.y = y;
@@ -14,7 +15,7 @@ public class Cell {
         this.row = row;
         this.col = col;
         this.cellState = cellState;
-
+        this.rules = rules;
     }
 
     public void evolve() {
@@ -28,7 +29,10 @@ public class Cell {
     }
 
     public void applyRules(Cell[][] cells){
-        int liveNeighbors =  calculateLiveNeighbors(cells);
+        int liveNeighbors = calculateLiveNeighbors(cells);
+        this.cellState = rules.applyRules(this.cellState, liveNeighbors);
+
+        /*
         if (this.cellState == cellState.ALIVE){
             if(liveNeighbors > 3 || liveNeighbors < 2){
                 this.cellState = cellState.WILL_DIE;
@@ -39,34 +43,35 @@ public class Cell {
                 this.cellState = cellState.WILL_REVIVE;
             }
         }
+        */
     }
 
     private int calculateLiveNeighbors(Cell[][] cells){
         int liveNeighbors = 0;
         // look at state of eight surrounding cells
         if (cells[row][col-1].cellState == CellState.ALIVE || cells[row][col-1].cellState == CellState.WILL_DIE){
-            liveNeighbors++;
+            liveNeighbors++; //left
         }
         if (cells[row][col+1].cellState == CellState.ALIVE || cells[row][col+1].cellState == CellState.WILL_DIE){
-            liveNeighbors++;
+            liveNeighbors++;//right
         }
         if (cells[row-1][col].cellState == CellState.ALIVE || cells[row-1][col].cellState == CellState.WILL_DIE){
-            liveNeighbors++;
+            liveNeighbors++;//up
         }
         if (cells[row+1][col].cellState == CellState.ALIVE || cells[row+1][col].cellState == CellState.WILL_DIE){
-            liveNeighbors++;
+            liveNeighbors++;// down
         }
         if (cells[row-1][col-1].cellState == CellState.ALIVE || cells[row-1][col-1].cellState == CellState.WILL_DIE){
-            liveNeighbors++;
+            liveNeighbors++;//left up
         }
         if (cells[row+1][col-1].cellState == CellState.ALIVE || cells[row+1][col-1].cellState == CellState.WILL_DIE){
-            liveNeighbors++;
+            liveNeighbors++;//left down
         }
         if (cells[row-1][col+1].cellState == CellState.ALIVE || cells[row-1][col+1].cellState == CellState.WILL_DIE){
-            liveNeighbors++;
+            liveNeighbors++;//right down
         }
         if (cells[row+1][col+1].cellState == CellState.ALIVE || cells[row+1][col+1].cellState == CellState.WILL_DIE){
-            liveNeighbors++;
+            liveNeighbors++;//right up
         }
         return liveNeighbors;
     }
